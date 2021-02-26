@@ -22,14 +22,14 @@ def create_hparams(hparams_string=None, verbose=False):
         dist_url="tcp://localhost:54321",
         cudnn_enabled=True,
         cudnn_benchmark=False,
-        ignore_layers=[''],
+        ignore_layers=['embedding.weight'],
 
         ################################
         # Data Parameters             #
         ################################
         load_mel_from_disk=False,
-        training_files='filelists/vivos/22050/male/train.txt',
-        validation_files='filelists/vivos/22050/male/test.txt',
+        training_files='filelists/viet_tts_train.txt',
+        validation_files='filelists/viet_tts_valid.txt',
         text_cleaners=['basic_cleaners'],
 
         ################################
@@ -84,7 +84,7 @@ def create_hparams(hparams_string=None, verbose=False):
         learning_rate=1e-3,
         weight_decay=1e-6,
         grad_clip_thresh=1.0,
-        batch_size=4,
+        batch_size=64,
         mask_padding=True  # set model's padded outputs to padded values
     )
 
