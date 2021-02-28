@@ -9,7 +9,7 @@ import os
 sys.path.append('waveglow/')
 import numpy as np
 import torch
-
+import argparse
 from hparams import create_hparams
 from model import Tacotron2
 from layers import TacotronSTFT, STFT
@@ -25,12 +25,13 @@ def plot_data(data, figsize=(16, 4)):
         axes[i].imshow(data[i], aspect='auto', origin='bottom',
                        interpolation='none')
 
-def inference():
+def inference(parser):
+    text = parser.text
     hparams = create_hparams()
     hparams.sampling_rate = 22050
 
 
-    checkpoint_path = "./output2/checkpoint_16000_male.pt"
+    checkpoint_path = parser.checkpoint
     model = load_model(hparams)
     model.load_state_dict(torch.load(checkpoint_path)['state_dict'])
     _ = model.cuda().eval()
@@ -43,13 +44,10 @@ def inference():
     #     k.float()
     denoiser = Denoiser(waveglow)
 
-    text = "Xin chào các bạn"
     sequence = np.array(text_to_sequence(text, ['basic_cleaners']))[None, :]
-    print(sequence)
     # sequence = torch.autograd.Variable(
     #     torch.from_numpy(sequence)).cuda().long()
     sequence = torch.from_numpy(sequence).to(device='cuda', dtype=torch.int64)
-    print(sequence)
 
 
     with torch.no_grad():
@@ -61,6 +59,12 @@ def inference():
         audio = waveglow.infer(mel_outputs_postnet)
     audio_numpy = audio[0].data.cpu().numpy()
     #ipd.Audio(audio[0].data.cpu().numpy(), rate=hparams.sampling_rate)
-    write("demo2.wav", hparams.sampling_rate, audio_numpy.astype('int16'))
+    write("demo.wav", hparams.sampling_rate, audio_numpy.astype('int16'))
 
-inference()
+def main():
+    parser = argparse.ArgumentParser()
+    parser.add_argument('--text', required=True)
+    parser.add_argument('--checkpoint', default= "./output/checkpoint_16000.pt")
+    inference(parser)
+if __name__ == "__main__":
+    main()
