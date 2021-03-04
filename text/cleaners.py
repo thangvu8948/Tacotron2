@@ -17,7 +17,7 @@ from unidecode import unidecode
 from .numbers import normalize_numbers
 from num2words import num2words
 from unicodedata import normalize
-
+from text.vicleaners import  cleaners
 # Regular expression matching whitespace:
 _whitespace_re = re.compile(r'\s+')
 
@@ -55,7 +55,7 @@ def convert_time_to_text(time_string):
     time_string = vi_num2words(int(h)) + " giờ " + vi_num2words(int(m)) + " phút"
     return time_string
   except:
-    return None
+    return ""
 
 
 def replace_time(text):
@@ -76,8 +76,7 @@ def replace_number(text):
 def normalize_text(text):
   text = normalize("NFC", text)
   text = text.lower()
-  text = replace_time(text)
-  text = replace_number(text)
+  text = cleaners(text).do()
   return text
 
 def expand_abbreviations(text):
